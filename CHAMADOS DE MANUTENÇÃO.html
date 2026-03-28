@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Chamados</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #f4f4f4;
+    margin: 0;
+}
+
+header {
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.container {
+    padding: 20px;
+}
+
+form {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+button {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.chamado {
+    background: white;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 5px solid #3498db;
+}
+</style>
+
+</head>
+<body>
+
+<header>
+    <h1>Sistema de Chamados - Manutenção</h1>
+</header>
+
+<div class="container">
+
+<form id="formChamado">
+    <h3>Abrir Chamado</h3>
+    <input type="text" id="nome" placeholder="Seu nome" required>
+    <input type="text" id="equipamento" placeholder="Equipamento" required>
+    
+    <select id="prioridade">
+        <option value="Baixa">Baixa</option>
+        <option value="Média">Média</option>
+        <option value="Alta">Alta</option>
+    </select>
+
+    <textarea id="descricao" placeholder="Descreva o problema"></textarea>
+
+    <button type="submit">Abrir Chamado</button>
+</form>
+
+<div id="listaChamados"></div>
+
+</div>
+
+<script>
+let chamados = JSON.parse(localStorage.getItem("chamados")) || [];
+
+function salvarChamados() {
+    localStorage.setItem("chamados", JSON.stringify(chamados));
+}
+
+function renderizarChamados() {
+    const lista = document.getElementById("listaChamados");
+    lista.innerHTML = "";
+
+    chamados.forEach((c, index) => {
+        lista.innerHTML += `
+            <div class="chamado">
+                <strong>${c.nome}</strong> - ${c.equipamento}<br>
+                Prioridade: ${c.prioridade}<br>
+                <p>${c.descricao}</p>
+                <button onclick="removerChamado(${index})">Excluir</button>
+            </div>
+        `;
+    });
+}
+
+function removerChamado(index) {
+    chamados.splice(index, 1);
+    salvarChamados();
+    renderizarChamados();
+}
+
+document.getElementById("formChamado").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const chamado = {
+        nome: document.getElementById("nome").value,
+        equipamento: document.getElementById("equipamento").value,
+        prioridade: document.getElementById("prioridade").value,
+        descricao: document.getElementById("descricao").value
+    };
+
+    chamados.push(chamado);
+    salvarChamados();
+    renderizarChamados();
+
+    this.reset();
+});
+
+renderizarChamados();
+</script>
+
+</body>
+</html>
